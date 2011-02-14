@@ -3,6 +3,32 @@ package Devel::REPL::Plugin::DataPrinter;
 use strict;
 use warnings;
 
+use Devel::REPL::Plugin;
+use Data::Printer 0.03;
+
+around 'format_result' => sub {
+   my $orig = shift;
+   my $self = shift;
+   my @to_dump = @_;
+   my $out;
+   if (@to_dump != 1 || ref $to_dump[0]) {
+      if (@to_dump == 1) {
+         if ( overload::Method($to_dump[0], '""') ) {
+            $out = "@to_dump";
+         }
+         else {
+             $out = p $to_dump[0];
+         }
+      } else {
+         $out = p @to_dump;
+      }
+   } else {
+      $out = $to_dump[0];
+   }
+   $self->$orig($out);
+};
+
+
 1;
 __END__
 
@@ -16,6 +42,6 @@ That's about it. Your re.pl should now give you nicer outputs :)
 
 =head1 SEE ALSO
 
-=for :list
 * L<Devel::REPL>
 * L<Devel::REPL::Plugin::DDS>
+
