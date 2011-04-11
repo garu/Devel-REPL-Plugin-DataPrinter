@@ -2,9 +2,12 @@ Revision history for Devel-REPL-Plugin-DataPrinter
 
 {{$NEXT}}
 
+0.002     2011-04-11
+
     - updating version dependency
     - improving documentation
 
-0.001   2011-02-14
+
+0.001     2011-02-14
 
     - releasing on an unsuspecting world
