@@ -1,10 +1,10 @@
 package Devel::REPL::Plugin::DataPrinter;
-# ABSTRACT: Format results with Data::Printer
+# ABSTRACT: Format REPL results with Data::Printer
 use strict;
 use warnings;
 
 use Devel::REPL::Plugin;
-use Data::Printer 0.03;
+use Data::Printer 0.08;
 
 around 'format_result' => sub {
    my $orig = shift;
@@ -36,7 +36,7 @@ __END__
 
 In your re.pl config file (usually C<< ~/.re.pl/repl.rc >>):
 
-    $_REPL->load_plugin('DataPrinter');
+    load_plugin('DataPrinter');
 
 That's about it. Your re.pl should now give you nicer outputs :)
 
