@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Devel::REPL::Plugin;
-use Data::Printer 0.08;
+use Data::Printer colored => 1;
 
 around 'format_result' => sub {
    my $orig = shift;
