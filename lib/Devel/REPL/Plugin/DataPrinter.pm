@@ -6,21 +6,32 @@ use warnings;
 use Devel::REPL::Plugin;
 use Data::Printer colored => 1, use_prototypes => 1;
 
+has dataprinter_config => (
+    is      => 'rw',
+    default => sub { {} },
+);
+
 around 'format_result' => sub {
    my $orig = shift;
    my $self = shift;
    my @to_dump = @_;
    my $out;
+   my %config = (
+      %{ $self->dataprinter_config },
+
+      # we need to force this!
+      return_value => 'dump',
+   );
    if (@to_dump != 1 || ref $to_dump[0]) {
       if (@to_dump == 1) {
          if ( overload::Method($to_dump[0], '""') ) {
             $out = "@to_dump";
          }
          else {
-             $out = p $to_dump[0];
+            $out = p $to_dump[0], %config;
          }
       } else {
-         $out = p @to_dump;
+         $out = p @to_dump, %config;
       }
    } else {
       $out = $to_dump[0];
@@ -39,6 +50,30 @@ In your re.pl config file (usually C<< ~/.re.pl/repl.rc >>):
     load_plugin('DataPrinter');
 
 That's about it. Your re.pl should now give you nicer outputs :)
+
+=head1 CUSTOMIZATION
+
+This plugin also provides a method C<dataprinter_config>, which can
+be used to configure L<Data::Printer> for use in L<Devel::REPL>.  For example,
+if you don't care for colored output:
+
+    $_REPL->dataprinter_config({
+      colored => 0,
+    });
+
+Or if you ask for caller_info in your .dataprinter file, but don't want it in
+the REPL:
+
+    $_REPL->dataprinter_config({
+      caller_info => 0,
+    });
+
+See L<Data::Printer/Customization> for configuration options; the values
+provided to C<dataprinter_config> override your .dataprinterrc.  C<colored> is
+on by default, and the only settings you may not override are
+C<use_prototypes> and C<return_value>.  Note that C<dataprinter_config> only
+applies to the printing that the REPL does; if you invoke C<p()> in your REPL
+session yourself, these settings are B<not> applied.
 
 =head1 SEE ALSO
 
