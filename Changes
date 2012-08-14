@@ -2,6 +2,13 @@ Revision history for Devel-REPL-Plugin-DataPrinter
 
 {{$NEXT}}
 
+    - new feature: custom configuration (Rob Hoelz)
+    - other: updated development plugins for dzil
+
+0.003     2011-07-20
+
+    - fixed autocoloring issue (stanislaw)
+
 0.002     2011-04-11
 
     - updating version dependency
