@@ -2,6 +2,8 @@ Revision history for Devel-REPL-Plugin-DataPrinter
 
 {{$NEXT}}
 
+0.004     2012-08-14
+
     - new feature: custom configuration (Rob Hoelz)
     - other: updated development plugins for dzil
 
