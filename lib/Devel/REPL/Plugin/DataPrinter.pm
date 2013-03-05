@@ -24,8 +24,9 @@ around 'format_result' => sub {
    );
    if (@to_dump != 1 || ref $to_dump[0]) {
       if (@to_dump == 1) {
-         if ( overload::Method($to_dump[0], '""')
-                and not exists $config{override_stringify}{ref $to_dump[0]} ) {
+         if ( (!exists $config{stringify}{ref $to_dump[0]}
+                 && overload::Method($to_dump[0], '""'))
+             or $config{stringify}{ref $to_dump[0]} ) {
             $out = "@to_dump";
          }
          else {
@@ -80,15 +81,15 @@ session yourself, these settings are B<not> applied.
 
 =over
 
-=item override_stringify
+=item stringify
 
 If the reference being printed has a stringification overloaded method and you
-do not want to use it by default, you can configure an override:
+do not want to use it by default, you can configure an override by setting the
+package to zero:
 
     $_REPL->dataprinter_config({
-      caller_info => 0,
-      override_stringify => {
-        'DateTime' => 1,
+      stringify => {
+        'DateTime' => 0,
       },
     });
 
