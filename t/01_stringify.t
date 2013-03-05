@@ -1,66 +1,76 @@
 #!/usr/bin/env perl
 
-{
-    package Mock::Stringify;
-    use overload ('""' => \&stringify);
-    sub new { my $s = "internal data"; bless \$s; }
-    sub stringify { "stringified" }
-}
+use FindBin qw($Bin);
+use lib "$Bin/../t/lib";
 
-{
-    package Term::ReadLine::Mock;
-    sub ReadLine {'Term::ReadLine::Mock'};
-    sub readline { 'my $s = Mock::Stringify->new' }
-    sub new { bless {} }
-    sub string {
-        my ($self) = @_;
-        unless ( $self->{string} ) {
-            my $string;
-            $self->{string} = \$string;
-        }
-        $self->{string};
-    }
-    sub OUT {
-        my ($self) = @_;
-        unless($self->{OUT}) {
-            open($self->{OUT}, '>', \${$self->{string}})
-                or die "Could not open string for writing";
-        }
-        $self->{OUT};
-    }
-}
-
-
-use Test::More tests => 4;
+use Test::More tests => 10;
 
 use_ok('Devel::REPL');
+use_ok('Mock::Stringify');
+use_ok('Mock::NonStringify');
+use_ok('Term::ReadLine::Mock');
 
-my $repl_default = get_repl();
-$repl_default->run_once();
-is(${$repl_default->term->string}, "stringified", "stringified by default");
-
-my $repl_stringify_on = get_repl();
-$repl_stringify_on->dataprinter_config({
-    stringify => {
-        'Mock::Stringify' => 1,
+my $data = {
+    'Mock::Stringify' => {
+        default => { regex => qr/^stringified$/,
+            message => "stringified by default",
+            config => {}
+        },
+        stringify_on => { regex => qr/^stringified$/,
+            message => "stringified by setting 'stringify' to true",
+            config => {
+                stringify => {
+                    'Mock::Stringify' => 1,
+                },
+            }
+        },
+        stringify_off => { regex => qr/internal data/s,
+            message => "not stringified by setting 'stringify' to false - internal data",
+            config => {
+                stringify => {
+                    'Mock::Stringify' => 0,
+                },
+            }
+        },
     },
-});
-$repl_stringify_on->run_once();
-is(${$repl_stringify_on->term->string}, "stringified", "stringified by setting 'stringify' to true");
-
-my $repl_stringify_off = get_repl();
-$repl_stringify_off->dataprinter_config({
-    stringify => {
-        'Mock::Stringify' => 0,
+    'Mock::NonStringify' => {
+        default => { regex => qr/internal data/s,
+            message => "not stringified by default - internal data",
+            config => {}
+        },
+        stringify_on => { regex => qr/SCALAR/,
+            message => "stringified by setting 'stringify' to true - SCALAR",
+            config => {
+                stringify => {
+                    'Mock::NonStringify' => 1,
+                },
+            }
+        },
+        stringify_off => { regex => qr/internal data/s,
+            message => "not stringified by setting 'stringify' to false",
+            config => {
+                stringify => {
+                    'Mock::NonStringify' => 0,
+                },
+            }
+        },
     },
-});
-$repl_stringify_off->run_once();
-like(${$repl_stringify_off->term->string}, qr/internal data/s, "not stringified by setting 'stringify' to false");
+};
+
+for my $class (keys $data) {
+    for my $type (keys $data->{$class}) {
+        my $repl = get_repl($class."->new");
+        $repl->dataprinter_config($data->{$class}{$type}{config});
+        $repl->run_once();
+        like(${$repl->term->string}, $data->{$class}{$type}{regex}, "$class -> $type -> $data->{$class}{$type}{message}" );
+    }
+}
 
 sub get_repl {
+    my ($cmd) = @_;
     my $repl = Devel::REPL->new;
     $repl->load_plugin('DataPrinter');
-    $repl->term(Term::ReadLine::Mock->new());
+    $repl->term(Term::ReadLine::Mock->new({ cmd => $cmd }));
     $repl;
 }
 
