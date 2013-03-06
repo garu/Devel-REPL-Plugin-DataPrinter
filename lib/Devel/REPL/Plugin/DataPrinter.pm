@@ -24,7 +24,9 @@ around 'format_result' => sub {
    );
    if (@to_dump != 1 || ref $to_dump[0]) {
       if (@to_dump == 1) {
-         if ( overload::Method($to_dump[0], '""') ) {
+         if ( (!exists $config{stringify}{ref $to_dump[0]}
+                 && overload::Method($to_dump[0], '""'))
+             or $config{stringify}{ref $to_dump[0]} ) {
             $out = "@to_dump";
          }
          else {
@@ -74,6 +76,25 @@ on by default, and the only settings you may not override are
 C<use_prototypes> and C<return_value>.  Note that C<dataprinter_config> only
 applies to the printing that the REPL does; if you invoke C<p()> in your REPL
 session yourself, these settings are B<not> applied.
+
+=head2 Devel::REPL::Plugin::DataPrinter specific customization
+
+=over
+
+=item stringify
+
+If the reference being printed has a stringification overloaded method and you
+do not want to use it by default, you can configure an override by setting the
+package to zero:
+
+    $_REPL->dataprinter_config({
+      stringify => {
+        'DateTime' => 0,
+      },
+    });
+
+=cut
+
 
 =head1 SEE ALSO
 
