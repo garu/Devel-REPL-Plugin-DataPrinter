@@ -2,6 +2,9 @@ Revision history for Devel-REPL-Plugin-DataPrinter
 
 {{$NEXT}}
 
+
+0.005     2013-03-07
+
     - new custom option: 'stringify' to control
       object stringification (Zaki Mughal)
 
