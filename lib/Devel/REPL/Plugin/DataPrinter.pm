@@ -93,11 +93,11 @@ package to zero:
       },
     });
 
-=cut
+=back
 
 
 =head1 SEE ALSO
 
 * L<Devel::REPL>
 * L<Devel::REPL::Plugin::DDS>
-
+* L<Data::Printer>
