@@ -57,8 +57,8 @@ my $data = {
     },
 };
 
-for my $class (keys $data) {
-    for my $type (keys $data->{$class}) {
+for my $class (keys %{$data}) {
+    for my $type (keys %{$data->{$class}}) {
         my $repl = get_repl($class."->new");
         $repl->dataprinter_config($data->{$class}{$type}{config});
         $repl->run_once();
