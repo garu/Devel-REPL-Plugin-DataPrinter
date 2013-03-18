@@ -2,6 +2,10 @@ Revision history for Devel-REPL-Plugin-DataPrinter
 
 {{$NEXT}}
 
+0.007     2013-03-17
+
+    - fix syntax of hash keys to support older Perls (Zaki Mughal)
+
 0.006     2013-03-07
 
     - minor pod fixes and updates
